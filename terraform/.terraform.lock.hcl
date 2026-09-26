@@ -6,6 +6,7 @@ provider "registry.terraform.io/cyrilgdn/postgresql" {
   constraints = "1.23.0"
   hashes = [
     "h1:LxsIoeIkUhmlyKUwhWKLsRBm6Ho4j/O4GdxgxjfOm0A=",
+    "h1:nDlB+hVWQtCDZhYe0T11usU/XYsVEnKC48rzJP9UMHI=",
     "zh:0bea106d7ffc7058a9a03359d2d973dd2b10f357a751ad7ead34e919af963adc",
     "zh:11758b27f60d74232a8a1b2cf2053ab27a7f060f1893fa773353425f295f6085",
     "zh:278605be3cbcaab43598ccbe1152956691e7af41e3c105034b1f3f643362f8c0",
@@ -27,6 +28,7 @@ provider "registry.terraform.io/hashicorp/local" {
   version     = "2.5.2"
   constraints = "2.5.2"
   hashes = [
+    "h1:6NIiHWMbE9bFZaUiqC+OokdWSbW7g3+yQYnO4yvgtuY=",
     "h1:JlMZD6nYqJ8sSrFfEAH0Vk/SL8WLZRmFaMUF9PJK5wM=",
     "zh:136299545178ce281c56f36965bf91c35407c11897f7082b3b983d86cb79b511",
     "zh:3b4486858aa9cb8163378722b642c57c529b6c64bfbfc9461d940a84cd66ebea",
@@ -47,6 +49,7 @@ provider "registry.terraform.io/kreuzwerker/docker" {
   version     = "3.0.2"
   constraints = "3.0.2"
   hashes = [
+    "h1:DcRxJArfX6EiATluWeCBW7HoD6usz9fMoTK2U3dmyPk=",
     "h1:cT2ccWOtlfKYBUE60/v2/4Q6Stk1KYTNnhxSck+VPlU=",
     "zh:15b0a2b2b563d8d40f62f83057d91acb02cd0096f207488d8b4298a59203d64f",
     "zh:23d919de139f7cd5ebfd2ff1b94e6d9913f0977fcfc2ca02e1573be53e269f95",

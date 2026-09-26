@@ -16,20 +16,32 @@ PostgreSQL server itself.
 
 ## Configure and apply
 
-Run Terraform from the `terraform` directory. Supply values in a local, untracked
-`terraform.tfvars` file, for example:
+Run Terraform from the `terraform` directory. Supply values as `TF_VAR_` environment
+variables (for example in the shared `terraform.sh` script):
 
-```hcl
-docker_network          = "organize_me_network"
-home_portal_image       = "home-portal:latest"
-home_portal_db_host     = "postgres"
-home_portal_db_username = "home_portal"
-home_portal_db_password = "replace-me"
-postgres_root_user      = "postgres"
-postgres_root_password  = "replace-me"
-backup_s3_bucket        = "my-home-portal-backups"
-oauth2_admin            = "email(\"admin@example.com\")"
-oauth2_client_secret    = "replace-me"
+```sh
+# Global
+export TF_VAR_timezone=America/Los_Angeles
+export TF_VAR_backup_install_path=../bin
+export TF_VAR_backup_tmp_dir=../tmp
+export TF_VAR_backup_s3_bucket=my-home-portal-backups
+
+# Docker Provider
+export TF_VAR_docker_network=organize_me_network
+
+# PostgreSQL
+export TF_VAR_postgres_host=localhost
+export TF_VAR_postgres_port=5432
+export TF_VAR_postgres_root_username=postgres
+export TF_VAR_postgres_root_password=replace-me
+
+# Home Portal
+export TF_VAR_home_portal_db_host=postgres
+export TF_VAR_home_portal_db_port=5432
+export TF_VAR_home_portal_db_username=home_portal
+export TF_VAR_home_portal_db_password=replace-me
+export TF_VAR_home_portal_oauth2_admin='email("admin@example.com")'
+export TF_VAR_home_portal_oauth2_client_secret=replace-me
 ```
 
 `postgres_host` defaults to `localhost` for Terraform's PostgreSQL provider. Set it to the

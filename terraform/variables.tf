@@ -53,7 +53,7 @@ variable "home_portal_db_password" {
   sensitive   = true
 }
 
-variable "postgres_root_user" {
+variable "postgres_root_username" {
   description = "The PostgreSQL administrator username used by Terraform"
   type        = string
 }
@@ -76,48 +76,48 @@ variable "postgres_port" {
   default     = 5432
 }
 
-variable "oauth2_enabled" {
+variable "home_portal_oauth2_enabled" {
   description = "Whether to enable OAuth2 authentication in Home Portal"
   type        = bool
   default     = true
 }
 
-variable "oauth2_admin" {
+variable "home_portal_oauth2_admin" {
   description = "The Home Portal OAuth2 administrator expression (for example, email(\"admin@example.com\"))"
   type        = string
 }
 
-variable "oauth2_issuer_url" {
+variable "home_portal_oauth2_issuer_url" {
   description = "The OAuth2 issuer URL"
   type        = string
   default     = "https://auth.vanderelst.house/auth/realms/home"
 }
 
-variable "oauth2_auth_url" {
+variable "home_portal_oauth2_auth_url" {
   description = "The OAuth2 authorization endpoint URL"
   type        = string
   default     = "https://auth.vanderelst.house/auth/realms/home/protocol/openid-connect/auth"
 }
 
-variable "oauth2_token_url" {
+variable "home_portal_oauth2_token_url" {
   description = "The OAuth2 token endpoint URL"
   type        = string
   default     = "https://auth.vanderelst.house/auth/realms/home/protocol/openid-connect/token"
 }
 
-variable "oauth2_client_id" {
+variable "home_portal_oauth2_client_id" {
   description = "The OAuth2 client ID"
   type        = string
   default     = "home-portal"
 }
 
-variable "oauth2_client_secret" {
+variable "home_portal_oauth2_client_secret" {
   description = "The OAuth2 client secret"
   type        = string
   sensitive   = true
 }
 
-variable "oauth2_client_scope" {
+variable "home_portal_oauth2_client_scope" {
   description = "Optional OAuth2 client scope"
   type        = string
   default     = " "

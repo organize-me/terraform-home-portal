@@ -17,3 +17,6 @@ home-portal-app-*/
 test/artifacts/
 test/bin/
 test/tmp/
+
+# Local variable script (contains secrets)
+/terraform.sh

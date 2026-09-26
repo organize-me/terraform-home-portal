@@ -18,7 +18,7 @@ variable "postgres_image" {
   default = "postgres:17"
 }
 
-variable "postgres_root_user" {
+variable "postgres_root_username" {
   type    = string
   default = "postgres"
 }

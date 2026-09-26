@@ -15,14 +15,14 @@ resource "docker_container" "home_portal" {
     "DATABASE_URL=jdbc:postgresql://${var.home_portal_db_host}:${var.home_portal_db_port}/${postgresql_database.home_portal.name}",
     "DATABASE_USERNAME=${var.home_portal_db_username}",
     "DATABASE_PASSWORD=${var.home_portal_db_password}",
-    "OAUTH2_ENABLED=${var.oauth2_enabled}",
-    "OAUTH2_ADMIN=${var.oauth2_admin}",
-    "OAUTH2_ISSUER_URL=${var.oauth2_issuer_url}",
-    "OAUTH2_AUTH_URL=${var.oauth2_auth_url}",
-    "OAUTH2_TOKEN_URL=${var.oauth2_token_url}",
-    "OAUTH2_CLIENT_ID=${var.oauth2_client_id}",
-    "OAUTH2_CLIENT_SECRET=${var.oauth2_client_secret}",
-    "OAUTH2_CLIENT_SCOPE=${var.oauth2_client_scope}",
+    "OAUTH2_ENABLED=${var.home_portal_oauth2_enabled}",
+    "OAUTH2_ADMIN=${var.home_portal_oauth2_admin}",
+    "OAUTH2_ISSUER_URL=${var.home_portal_oauth2_issuer_url}",
+    "OAUTH2_AUTH_URL=${var.home_portal_oauth2_auth_url}",
+    "OAUTH2_TOKEN_URL=${var.home_portal_oauth2_token_url}",
+    "OAUTH2_CLIENT_ID=${var.home_portal_oauth2_client_id}",
+    "OAUTH2_CLIENT_SECRET=${var.home_portal_oauth2_client_secret}",
+    "OAUTH2_CLIENT_SCOPE=${var.home_portal_oauth2_client_scope}",
   ]
 
   ports {
