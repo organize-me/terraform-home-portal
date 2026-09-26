@@ -1,0 +1,64 @@
+$ErrorActionPreference = "Stop"
+
+$BackupDirectory = "${TF_BACKUP_TMP_DIR}"
+$HostBackupFile = Join-Path $BackupDirectory "${TF_ARCHIVE_NAME}"
+$ContainerBackupFile = "/tmp/${TF_ARCHIVE_NAME}"
+$S3Uri = "s3://${TF_S3_BACKUP_BUCKET}/${TF_ARCHIVE_NAME}"
+
+function Invoke-Docker {
+    & docker @args
+    if ($LASTEXITCODE -ne 0) {
+        throw "Docker command failed with exit code $LASTEXITCODE"
+    }
+}
+
+New-Item -ItemType Directory -Force -Path $BackupDirectory | Out-Null
+Remove-Item -LiteralPath $HostBackupFile -Force -ErrorAction SilentlyContinue
+
+Write-Host "Removing any previous container backup"
+Invoke-Docker exec "${TF_HOME_PORTAL_CONTAINER}" rm -f $ContainerBackupFile
+
+Write-Host "Creating Home Portal backup"
+Invoke-Docker exec "${TF_HOME_PORTAL_CONTAINER}" home-portal backup $ContainerBackupFile
+
+try {
+    Write-Host "Copying backup to host"
+    Invoke-Docker cp "${TF_HOME_PORTAL_CONTAINER}:$ContainerBackupFile" $HostBackupFile
+
+    $DockerArguments = @(
+        "run", "--rm", "--network", "${TF_DOCKER_NETWORK}",
+        "--mount", "type=bind,source=$BackupDirectory,target=/backup,readonly"
+    )
+
+    $AwsDirectory = Join-Path $HOME ".aws"
+    if (Test-Path -LiteralPath $AwsDirectory) {
+        $DockerArguments += @("--mount", "type=bind,source=$AwsDirectory,target=/root/.aws,readonly")
+    }
+
+    foreach ($VariableName in @(
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "AWS_SESSION_TOKEN",
+        "AWS_DEFAULT_REGION",
+        "AWS_REGION",
+        "AWS_PROFILE"
+    )) {
+        $VariableValue = [Environment]::GetEnvironmentVariable($VariableName)
+        if (-not [string]::IsNullOrEmpty($VariableValue)) {
+            $DockerArguments += @("--env", "$VariableName=$VariableValue")
+        }
+    }
+
+    $DockerArguments += @("${TF_AWS_CLI_IMAGE}", "s3", "cp")
+    if (-not [string]::IsNullOrEmpty($env:AWS_S3_ENDPOINT_URL)) {
+        $DockerArguments += @("--endpoint-url", $env:AWS_S3_ENDPOINT_URL)
+    }
+    $DockerArguments += @("/backup/${TF_ARCHIVE_NAME}", $S3Uri)
+
+    Write-Host "Uploading backup to S3"
+    Invoke-Docker @DockerArguments
+    Write-Host "Backup uploaded to $S3Uri"
+}
+finally {
+    Remove-Item -LiteralPath $HostBackupFile -Force -ErrorAction SilentlyContinue
+}

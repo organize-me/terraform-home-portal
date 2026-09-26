@@ -1,0 +1,62 @@
+#!/bin/sh
+
+set -eu
+
+BACKUP_TMP_DIR="${TF_BACKUP_TMP_DIR}"
+HOST_BACKUP_FILE="$BACKUP_TMP_DIR/${TF_ARCHIVE_NAME}"
+CONTAINER_BACKUP_FILE="/tmp/${TF_ARCHIVE_NAME}"
+S3_URI="s3://${TF_S3_BACKUP_BUCKET}/${TF_ARCHIVE_NAME}"
+
+cleanup() {
+  rm -f "$HOST_BACKUP_FILE"
+}
+trap cleanup EXIT
+
+mkdir -p "$BACKUP_TMP_DIR"
+rm -f "$HOST_BACKUP_FILE"
+
+set -- --rm --network "${TF_DOCKER_NETWORK}" --volume "$BACKUP_TMP_DIR:/backup"
+
+if [ -d "$HOME/.aws" ]; then
+  set -- "$@" --volume "$HOME/.aws:/root/.aws:ro"
+fi
+
+if [ -n "$${AWS_ACCESS_KEY_ID:-}" ]; then
+  set -- "$@" --env "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+fi
+if [ -n "$${AWS_SECRET_ACCESS_KEY:-}" ]; then
+  set -- "$@" --env "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+fi
+if [ -n "$${AWS_SESSION_TOKEN:-}" ]; then
+  set -- "$@" --env "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
+fi
+if [ -n "$${AWS_DEFAULT_REGION:-}" ]; then
+  set -- "$@" --env "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
+fi
+if [ -n "$${AWS_REGION:-}" ]; then
+  set -- "$@" --env "AWS_REGION=$AWS_REGION"
+fi
+if [ -n "$${AWS_PROFILE:-}" ]; then
+  set -- "$@" --env "AWS_PROFILE=$AWS_PROFILE"
+fi
+
+echo "Downloading backup from S3"
+if [ -n "$${AWS_S3_ENDPOINT_URL:-}" ]; then
+  docker run "$@" "${TF_AWS_CLI_IMAGE}" s3 cp \
+    --endpoint-url "$AWS_S3_ENDPOINT_URL" \
+    "$S3_URI" "/backup/${TF_ARCHIVE_NAME}"
+else
+  docker run "$@" "${TF_AWS_CLI_IMAGE}" s3 cp \
+    "$S3_URI" "/backup/${TF_ARCHIVE_NAME}"
+fi
+
+echo "Removing any previous container backup"
+docker exec "${TF_HOME_PORTAL_CONTAINER}" rm -f "$CONTAINER_BACKUP_FILE"
+
+echo "Copying backup into container"
+docker cp "$HOST_BACKUP_FILE" "${TF_HOME_PORTAL_CONTAINER}:$CONTAINER_BACKUP_FILE"
+
+echo "Restoring Home Portal backup"
+docker exec "${TF_HOME_PORTAL_CONTAINER}" home-portal restore "$CONTAINER_BACKUP_FILE"
+
+echo "Backup restored from $S3_URI"

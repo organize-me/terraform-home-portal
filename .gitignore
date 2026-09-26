@@ -1,0 +1,19 @@
+# IntelliJ IDEA
+.idea
+
+# Terraform
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+*.tfvars
+*.tfvars.json
+
+# Generated backup artifacts
+/bin/*
+!/bin/.gitkeep
+tmp/
+test/app-*/
+home-portal-app-*/
+test/artifacts/
+test/bin/
+test/tmp/
